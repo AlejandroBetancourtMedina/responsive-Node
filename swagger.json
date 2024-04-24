@@ -1,0 +1,186 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Ejemplo de API",
+    "description": "Una API de ejemplo para demostrar OpenAPI",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3005/",
+      "description": "Servidor de desarrollo local"
+    }
+  ],
+  "paths": {
+    "/check-responsive": {
+      "post": {
+        "summary": "Verifica si una URL es responsive",
+        "description": "Envía una URL para comprobar si es responsive en diferentes resoluciones.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "http://example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado de la verificación de responsive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "isResponsive": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud incorrecta, URL es requerida"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/validate-html": {
+      "post": {
+        "summary": "Valida el HTML de un endpoint",
+        "description": "Envía un endpoint para validar el HTML presente en el mismo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "endpoint": {
+                    "type": "string",
+                    "example": "http://example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detalles de los errores de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/HtmlValidationSchema"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error al obtener o validar HTML"
+          }
+        }
+      }
+    },
+    "/validate-css": {
+      "post": {
+        "summary": "Valida el CSS de una URL",
+        "description": "Envía una URL para validar el CSS obtenido de la misma.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "http://example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resumen de errores de CSS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/components/schemas/CssValidationSchema"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error al obtener HTML o validar CSS"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HtmlValidationSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "extract": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "column": {
+            "type": "integer"
+          }
+        }
+      },
+      "CssValidationSchema": {
+        "type": "object",
+        "properties": {
+          "rule": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}
