@@ -9,7 +9,6 @@ const validateHTML = async (req, res) => {
     // Obtener el HTML del endpoint
     const response = await axios.get(endpoint);
     const html = response.data;
-    console.log("html", html);
     // Validar el HTML obtenido
     const options = {
       data: html,
@@ -22,13 +21,18 @@ const validateHTML = async (req, res) => {
       // Puedes acceder a error.firstLine, error.lastLine, error.firstColumn y error.lastColumn para obtener la ubicación
       // También puedes incluir el extracto de código HTML si está disponible
       return {
-        ...error,
+        type: error.type,
+        message: error.message,
         extract: error.extract ? error.extract.trim() : 'N/A', // El extracto proporciona un fragmento del HTML donde ocurrió el error
+        firstLine: error.firstLine,
+        lastLine: error.lastLine,
+        firstColumn: error.firstColumn,
+        lastColumn: error.lastColumn
       };
     });
 
     // Enviar solo los errores con detalles de ubicación en la respuesta
-    res.json({ errors: errorsWithLocation });
+    res.json(errorsWithLocation); // Devolvemos directamente el array de errores
   } catch (error) {
     res.status(500).json({ message: `Error fetching or validating HTML: ${error.message}` });
   }
@@ -76,7 +80,7 @@ const validateCSS = async (req, res) => {
       rule,
       count
     }));
-
+    console.log(errorSummary);
     res.json({ errorSummary });
   } catch (error) {
     res.status(500).json({ message: `Error fetching HTML or validating CSS: ${error.message}` });
