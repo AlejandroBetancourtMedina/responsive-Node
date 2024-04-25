@@ -64,7 +64,6 @@ const validateCSS = async (req, res) => {
             extends: 'stylelint-config-standard'
           }
         });
-
         for (const warning of lintResults.results[0].warnings) {
           const rule = warning.rule;
           const currentCount = globalErrorsMap.get(rule) || 0;
@@ -80,12 +79,12 @@ const validateCSS = async (req, res) => {
       rule,
       count
     }));
-    console.log(errorSummary);
     res.json({ errorSummary });
   } catch (error) {
     res.status(500).json({ message: `Error fetching HTML or validating CSS: ${error.message}` });
   }
 };
+
 
 module.exports = {
   validateCSS,

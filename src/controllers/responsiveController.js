@@ -2,13 +2,13 @@ const puppeteer = require('puppeteer');
 
 const checkResponsive = async (req, res) => {
   const { url } = req.body;
-  console.log("url", url)
   if (!url) {
     return res.status(400).json({ error: 'URL is required' });
   }
 
+  let browser;
   try {
-    const browser = await puppeteer.launch();
+    browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     const viewports = [
@@ -18,23 +18,35 @@ const checkResponsive = async (req, res) => {
     ];
 
     let isResponsive = true;
+    let failedViewport = null;
 
     for (const viewport of viewports) {
       await page.setViewport(viewport);
       await page.goto(url, { waitUntil: 'networkidle2' });
 
       // Verificar si cierto elemento es visible en la página en cada resolución
+      // Esto es un ejemplo, ajusta la selección del elemento según tus necesidades
       const elementoVisible = await page.$('.clase-del-elemento');
       if (!elementoVisible) {
         isResponsive = false;
-        break; // Si el elemento no es visible, ya no necesitas verificar más resoluciones
+        failedViewport = viewport; // Guardar la resolución que falló
+        break;
       }
     }
 
     await browser.close();
 
-    res.json({ url, isResponsive });
+    // Si la página no es responsiva, incluir la resolución que falló en la respuesta
+    if (!isResponsive) {
+      res.json({ url, isResponsive, failedViewport });
+    } else {
+      res.json({ url, isResponsive });
+      console.log(isResponsive, "lol");
+    }
   } catch (error) {
+    if (browser) {
+      await browser.close();
+    }
     res.status(500).json({ error: error.message });
   }
 };
